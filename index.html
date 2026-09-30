@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mapa da Conversa — Uma primeira leitura</title>
+
+<style>
+:root {
+  --navy: #01319D;
+  --green: #86BD08;
+  --purple: #834DAF;
+  --offwhite: #F6F4F7;
+  --charcoal: #3E4649;
+  --white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--offwhite);
+  color: var(--charcoal);
+  margin: 0;
+  padding: 40px 16px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 20px;
+  max-width: 680px;
+  width: 100%;
+  padding: 44px 36px;
+  box-shadow: 0 10px 40px rgba(1, 49, 157, 0.12);
+}
+
+.brand {
+  color: var(--navy);
+  font-weight: 800;
+  letter-spacing: .08em;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+h1, h2 {
+  font-family: Georgia, serif;
+  color: var(--navy);
+}
+
+.intro-title {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 8px 0 14px;
+}
+
+.intro-text {
+  font-size: 16px;
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+.how-to-answer {
+  background: #f6f8fc;
+  border-left: 4px solid var(--green);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.progress-wrap {
+  background: var(--offwhite);
+  border-radius: 10px;
+  height: 8px;
+  margin: 18px 0 30px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: var(--green);
+  height: 100%;
+  width: 0%;
+  transition: width .3s ease;
+}
+
+.qtext {
+  font-size: 22px;
+  line-height: 1.45;
+  margin-bottom: 26px;
+}
+
+.opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--offwhite);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--charcoal);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.opt:hover {
+  border-color: var(--green);
+  background: #f0f7e0;
+}
+
+.btn {
+  display: inline-block;
+  background: var(--green);
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 32px;
+  font-size: 15.5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.result-kicker {
+  color: var(--green);
+  font-weight: 800;
+  letter-spacing: .06em;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.result-title {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 0 0 18px;
+}
+
+.result-meta {
+  background: var(--offwhite);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+
+.meta-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #687276;
+  font-weight: 800;
+}
+
+.meta-value {
+  color: var(--navy);
+  font-size: 18px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+.result-quote {
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--purple);
+  border-left: 4px solid var(--green);
+  padding-left: 16px;
+  margin-bottom: 22px;
+}
+
+.result-text {
+  font-size: 15.5px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.result-label {
+  font-weight: 800;
+  color: var(--navy);
+  margin: 22px 0 7px;
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 18px 10px;
+  }
+
+  .card {
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+
+  .intro-title,
+  .result-title {
+    font-size: 26px;
+  }
+
+  .qtext {
+    font-size: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="brand">MAPA DA CONVERSA</div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div id="quizArea"></div>
+
+</div>
+
+<script>
+
+const QUESTIONS = [
+
+  {
+    id: "Q1",
+    situacao: "Em uma reunião, você tem uma ideia importante. Sua tendência é:",
+    options: [
+      ["Fazer questão de mostrar que sua ideia é mais completa.", "COMPETIÇÃO"],
+      ["Preparar argumentos para defendê-la.", "DEFESA"],
+      ["Esperar que alguém abra espaço para eu falar.", "RESGUARDO"],
+      ["Responder antes que a outra pessoa termine de falar.", "ATROPELO"],
+      ["Explicar todos os detalhes.", "EXPLICAÇÃO"]
+    ]
+  },
+
+  {
+    id: "Q3",
+    situacao: "Quando você discorda de alguém que tem mais autoridade que você, sua tendência é:",
+    options: [
+      ["Fazer questão de mostrar que também tem argumentos.", "COMPETIÇÃO"],
+      ["Mostrar que a responsabilidade não é sua.", "DEFESA"],
+      ["Ficar calada.", "RESGUARDO"],
+      ["Continuar explicando meu ponto de vista, acrescentando detalhes para que a pessoa entenda.", "EXPLICAÇÃO"],
+      ["Aguardar primeiro a reação da pessoa antes de decidir como me posicionar.", "APROVAÇÃO"]
+    ]
+  },
+
+  {
+    id: "Q5",
+    situacao: "Quando precisa falar o preço do seu trabalho, você costuma:",
+    options: [
+      ["Ficar com receio de que o cliente não aceite o valor e pensar em reduzi-lo.", "APROVAÇÃO"],
+      ["Desafiar o cliente a encontrar um custo-benefício melhor.", "COMPETIÇÃO"],
+      ["Oferecer uma condição melhor antes de ouvir a resposta.", "ATROPELO"],
+      ["Explicar tudo o que está incluído.", "EXPLICAÇÃO"],
+      ["Justificar o valor.", "DEFESA"]
+    ]
+  },
+
+  {
+    id: "Q8",
+    situacao: "Quando alguém da sua família pede algo que você não quer fazer, você tende a:",
+    options: [
+      ["Aceitar para não decepcionar a pessoa.", "APROVAÇÃO"],
+      ["Não conseguir dizer claramente que não quer fazer.", "RESGUARDO"],
+      ["Começar a imaginar por que a pessoa está fazendo esse pedido e tirar suas próprias conclusões antes de perguntar o que ela precisa.", "DESCONEXÃO"],
+      ["Já responder o que vai fazer antes de deixar a pessoa terminar de explicar o que precisa.", "ATROPELO"],
+      ["Fazer perguntas tentando entender o que tem por trás do pedido.", "FUNCIONAL"]
+    ]
+  },
+
+  {
+    id: "Q9",
+    situacao: "Quando uma amiga faz uma crítica sobre uma atitude sua, sua tendência é:",
+    options: [
+      ["Sentir necessidade de se defender daquilo que ela está dizendo.", "DEFESA"],
+      ["Mostrar para a amiga algum erro que ela também comete.", "COMPETIÇÃO"],
+      ["Dizer que não tinha percebido o problema e se desculpar, mesmo sem concordar completamente com a crítica.", "APROVAÇÃO"],
+      ["Concordar com a crítica para evitar o confronto, mesmo tendo outra opinião.", "RESGUARDO"],
+      ["Reagir se explicando, sem pedir mais detalhes sobre a crítica.", "ATROPELO"]
+    ]
+  },
+
+  {
+    id: "Q12",
+    situacao: "Quando seu parceiro conta para você algo que aconteceu no dia dele, sua tendência é:",
+    options: [
+      ["Não deixar seu parceiro terminar, fazendo perguntas que levam a outros aspectos do assunto ou começando a dar exemplos de outras histórias.", "ATROPELO"],
+      ["Assim que seu parceiro termina de contar, mudar de assunto sem comentar ou demonstrar interesse pelo que ele contou.", "DESCONEXÃO"],
+      ["Ouvir o que ele contou, mas evitar comentar ou fazer perguntas, mesmo tendo vontade de dizer alguma coisa.", "RESGUARDO"],
+      ["Aproveitar o que ele contou para explicar detalhadamente o que você pensa sobre aquela situação.", "EXPLICAÇÃO"],
+      ["Demonstrar concordância com o que ele pensa, mesmo tendo outra opinião, para evitar uma diferença entre vocês.", "APROVAÇÃO"]
+    ]
+  },
+
+  {
+    id: "Q13",
+    situacao: "Quando alguém de quem você gosta demora a responder uma mensagem, sua tendência é:",
+    options: [
+      ["Criar uma história sobre o motivo de a pessoa estar demorando para responder.", "DESCONEXÃO"],
+      ["Mandar outra mensagem, cobrar ou tomar alguma atitude antes de entender o que está acontecendo.", "ATROPELO"],
+      ["Interpretar a demora como rejeição e se proteger.", "DEFESA"],
+      ["Adaptar sua forma de agir para não desagradar a pessoa.", "APROVAÇÃO"],
+      ["Ter vontade de perguntar o que está acontecendo, mas preferir não falar para não se expor.", "RESGUARDO"]
+    ]
+  },
+
+  {
+    id: "Q16",
+    situacao: "Quando você percebe que uma amizade está ficando distante, sua tendência é:",
+    options: [
+      ["Imaginar os motivos do afastamento e tirar suas próprias conclusões, sem conversar com a amiga sobre isso.", "DESCONEXÃO"],
+      ["Mudar seu jeito de agir com a amiga para tentar recuperar a proximidade entre vocês.", "APROVAÇÃO"],
+      ["Ter vontade de perguntar o que está acontecendo, mas preferir não falar para não se expor.", "RESGUARDO"],
+      ["Procurar a amiga imediatamente para tentar resolver o afastamento, sem antes entender o que está acontecendo.", "ATROPELO"],
+      ["Sentir necessidade de explicar à amiga tudo o que você fez ou deixou de fazer para tentar esclarecer o afastamento.", "EXPLICAÇÃO"]
+    ]
+  },
+
+  {
+    id: "Q18",
+    situacao: "Quando você conta uma situação para alguém próximo e percebe que a pessoa entendeu o que aconteceu de uma maneira diferente da sua, sua tendência é:",
+    options: [
+      ["Continuar explicando a situação, acrescentando detalhes para que a pessoa entenda exatamente o que aconteceu.", "EXPLICAÇÃO"],
+      ["Fazer questão de mostrar que a sua interpretação da situação está mais correta.", "COMPETIÇÃO"],
+      ["Ter outra interpretação sobre o que aconteceu, mas não conseguir dizer o que realmente pensa.", "RESGUARDO"],
+      ["Mudar a forma como você conta a situação para tentar fazer a pessoa concordar com você.", "APROVAÇÃO"],
+      ["Interromper a pessoa para corrigir o que ela entendeu antes que ela termine de explicar seu ponto de vista.", "ATROPELO"]
+    ]
+  }
+
+];
+
+
+const RESULTS = {
+
+  DEFESA: {
+    nome: "DEFESA",
+    conversa: "Eu preciso me proteger antes de ouvir você.",
+    texto: "A Defesa aparece quando, diante de uma crítica, cobrança ou discordância, surge a necessidade de se proteger antes mesmo de compreender completamente o que o outro está dizendo. Esse movimento pode ajudar você a preservar seus limites e sua posição. O ponto de atenção aparece quando essa proteção entra em cena antes da escuta.",
+    movimento: "Antes de responder, experimente perguntar: estou respondendo ao que foi realmente dito ou ao que imaginei que isso significa sobre mim?"
+  },
+
+  RESGUARDO: {
+    nome: "RESGUARDO",
+    conversa: "Eu quero me colocar, mas alguma coisa me faz recuar.",
+    texto: "O Resguardo aparece quando existe vontade de se colocar, mas você acaba recuando diante da possibilidade de se expor. Esse movimento pode trazer prudência, observação e respeito pelos próprios limites. O ponto de atenção aparece quando o cuidado de se preservar impede você de dizer aquilo que realmente pensa, sente, precisa ou quer.",
+    movimento: "Pergunte a si mesma: o que eu gostaria de dizer se não precisasse controlar a reação do outro?"
+  },
+
+  ATROPELO: {
+    nome: "ATROPELO",
+    conversa: "Eu preciso avançar.",
+    texto: "O Atropelo aparece quando a necessidade de avançar, resolver ou conduzir faz você ocupar o espaço da conversa antes que o outro termine de construir o que queria dizer. Esse movimento traz iniciativa, ação e capacidade de condução. O ponto de atenção aparece quando essa velocidade faz você perder informações importantes.",
+    movimento: "Antes de avançar, pergunte: o que ainda precisa ser ouvido antes de eu responder?"
+  },
+
+  APROVAÇÃO: {
+    nome: "APROVAÇÃO",
+    conversa: "Eu me adapto a você.",
+    texto: "A Aprovação aparece quando a necessidade de preservar o vínculo faz você adaptar sua posição ao que acredita que o outro espera. Esse movimento traz empatia, sensibilidade e cuidado com os relacionamentos. O ponto de atenção aparece quando, para evitar desagradar, você deixa sua própria posição em segundo plano.",
+    movimento: "Pergunte: o que é verdadeiro para mim nesta situação, antes de pensar no que o outro gostaria de ouvir?"
+  },
+
+  EXPLICAÇÃO: {
+    nome: "EXPLICAÇÃO",
+    conversa: "Eu preciso explicar.",
+    texto: "A Explicação aparece quando existe uma necessidade de garantir que o outro compreenda aquilo que você quer dizer. Esse movimento traz capacidade de aprofundar, esclarecer e organizar informações. O ponto de atenção aparece quando você continua explicando além do necessário e deixa menos espaço para o outro.",
+    movimento: "Pergunte: o que é essencial dizer agora?"
+  },
+
+  COMPETIÇÃO: {
+    nome: "COMPETIÇÃO",
+    conversa: "Eu não posso ficar por baixo.",
+    texto: "A Competição aparece quando a pessoa entra na conversa medindo seu valor em relação ao outro. Esse movimento traz ambição, determinação e desejo de crescer. O ponto de atenção aparece quando a necessidade de sustentar sua posição transforma a conversa em uma disputa para provar quem tem razão.",
+    movimento: "Experimente trocar, por alguns instantes, a necessidade de responder pela curiosidade: o que existe no ponto de vista do outro que eu ainda não considerei?"
+  },
+
+  DESCONEXÃO: {
+    nome: "DESCONEXÃO",
+    conversa: "Eu já sei onde essa conversa vai dar.",
+    texto: "A Desconexão acontece quando você deixa de acompanhar o que o outro está realmente dizendo porque sua própria narrativa interna passa a ocupar o lugar da escuta. Esse movimento pode trazer autonomia e capacidade de preservar energia. O ponto de atenção aparece quando você começa a reagir a uma interpretação sua, em vez de acompanhar o que está sendo construído na conversa.",
+    movimento: "Pergunte: estou acompanhando o que o outro realmente disse ou já estou reagindo à história que criei na minha cabeça?"
+  }
+
+};
+
+
+let currentQuestion = 0;
+let answers = [];
+
+const quizArea = document.getElementById("quizArea");
+const progressBar = document.getElementById("progressBar");
+
+
+function renderIntro() {
+
+  progressBar.style.width = "0%";
+
+  quizArea.innerHTML = `
+    <h1 class="intro-title">
+      Descubra o que pode estar por trás da maneira como você se comunica.
+    </h1>
+
+    <p class="intro-text">
+      Responda a 9 situações do dia a dia.
+      No final, você terá uma primeira leitura das tendências
+      que podem aparecer nas suas conversas.
+    </p>
+
+    <div class="how-to-answer">
+      <strong>Como responder</strong>
+
+      <p>
+        Em cada pergunta, escolha a alternativa que mais se aproxima
+        do que costuma acontecer com você.
+      </p>
+
+      <p>
+        Não precisa ser exatamente assim em todas as situações.
+        Pense na sua tendência mais frequente.
+      </p>
+    </div>
+
+    <button class="btn" onclick="startQuiz()">
+      Começar o quiz →
+    </button>
+  `;
+}
+
+
+function startQuiz() {
+
+  currentQuestion = 0;
+  answers = [];
+
+  renderQuestion();
+}
+
+
+function renderQuestion() {
+
+  const progress =
+    Math.round((currentQuestion / QUESTIONS.length) * 100);
+
+  progressBar.style.width = progress + "%";
+
+  const question = QUESTIONS[currentQuestion];
+
+  let html = `
+    <h2 class="qtext">
+      ${question.situacao}
+    </h2>
+  `;
+
+  question.options.forEach((option, index) => {
+
+    html += `
+      <button
+        class="opt"
+        onclick="selectAnswer(${index})">
+        ${String.fromCharCode(65 + index)}. ${option[0]}
+      </button>
+    `;
+
+  });
+
+  quizArea.innerHTML = html;
+}
+
+
+function selectAnswer(optionIndex) {
+
+  const question = QUESTIONS[currentQuestion];
+
+  answers.push(question.options[optionIndex][1]);
+
+  currentQuestion++;
+
+  if (currentQuestion < QUESTIONS.length) {
+
+    renderQuestion();
+
+  } else {
+
+    showResult();
+
+  }
+}
+
+
+function calculateScores() {
+
+  const scores = {
+    DEFESA: 0,
+    RESGUARDO: 0,
+    ATROPELO: 0,
+    APROVAÇÃO: 0,
+    EXPLICAÇÃO: 0,
+    COMPETIÇÃO: 0,
+    DESCONEXÃO: 0
+  };
+
+  answers.forEach(pattern => {
+
+    if (scores[pattern] !== undefined) {
+      scores[pattern]++;
+    }
+
+  });
+
+  return scores;
+}
+
+
+function showResult() {
+
+  progressBar.style.width = "100%";
+
+  const scores = calculateScores();
+
+  const ordered = Object.keys(scores)
+    .sort((a, b) => scores[b] - scores[a]);
+
+  const highest = scores[ordered[0]];
+
+  const primary = ordered.filter(
+    pattern => scores[pattern] === highest
+  );
+
+  const mainPattern = primary[0];
+
+  const result = RESULTS[mainPattern];
+
+  let title;
+
+  if (primary.length === 1) {
+
+    title = "Sua tendência predominante";
+
+  } else {
+
+    title = "As tendências que mais apareceram";
+
+  }
+
+  quizArea.innerHTML = `
+
+    <div class="result-kicker">
+      UMA PRIMEIRA LEITURA DO SEU MAPA
+    </div>
+
+    <h1 class="result-title">
+      Seu resultado
+    </h1>
+
+    <div class="result-meta">
+
+      <div class="meta-label">
+        ${title}
+      </div>
+
+      <div class="meta-value">
+        ${primary.join(" + ")}
+      </div>
+
+    </div>
+
+    <div class="result-quote">
+      “${result.conversa}”
+    </div>
+
+    <div class="result-text">
+      ${result.texto}
+    </div>
+
+    <div class="result-label">
+      Um primeiro movimento
+    </div>
+
+    <div class="result-text">
+      ${result.movimento}
+    </div>
+
+    <div class="result-label">
+      Quer aprofundar essa leitura?
+    </div>
+
+    <div class="result-text">
+      O Mapa da Conversa completo analisa suas respostas
+      em 18 situações para mostrar como suas travas aparecem
+      ao Escutar, Falar e Interagir.
+    </div>
+
+    <button class="btn"
+      onclick="alert('Na próxima etapa vamos conectar esta tela ao Mapa Completo.')">
+      Quero conhecer meu Mapa da Conversa completo →
+    </button>
+
+  `;
+}
+
+
+renderIntro();
+
+</script>
+
+</body>
+</html>
