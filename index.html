@@ -241,6 +241,15 @@ h1, h2 {
   line-height: 1.6;
 }
 
+.result-pattern {
+  margin-top: 28px;
+}
+
+.result-pattern + .result-pattern {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 28px;
+}
+
 
 @media (max-width: 520px) {
   body {
@@ -715,6 +724,7 @@ async function submitLead() {
           result: currentResult.primary || "EMPATE",
           secondary: currentResult.secondary,
           primaryPatterns: currentResult.primaryPatterns,
+          resultPatterns: getResultPatterns(currentResult),
           pontuacaoPredominante: currentResult.primaryScore,
           pontuacaoSecundario: currentResult.secondaryScore,
           respostas: answers
@@ -749,95 +759,94 @@ async function submitLead() {
 }
 
 
-function showResult(resultData) {
+function getResultPatterns(resultData) {
 
-  const {
-    primary,
-    primaryPatterns,
-    secondary
-  } = resultData;
+  // Empate no topo: todos os padrões empatados entram no resultado.
+  if (!resultData.primary) {
+    return resultData.primaryPatterns;
+  }
 
-  // Empate no topo: não escolhemos um predominante artificialmente.
-  if (!primary) {
+  // Sem empate: predominante + secundário qualificado, quando existir.
+  return resultData.secondary
+    ? [resultData.primary, resultData.secondary]
+    : [resultData.primary];
+}
 
-    quizArea.innerHTML = `
 
-      <div class="result-kicker">
-        UMA PRIMEIRA LEITURA DO SEU MAPA
-      </div>
+function renderPatternResult(pattern) {
 
-      <h1 class="result-title">
-        Seu resultado
-      </h1>
+  const result = RESULTS[pattern];
+
+  return `
+    <div class="result-pattern">
 
       <div class="result-meta">
 
         <div class="meta-label">
-          As tendências que mais apareceram
+          Tendência
         </div>
 
         <div class="meta-value">
-          ${primaryPatterns.join(" + ")}
+          ${result.nome}
         </div>
 
       </div>
 
+      <div class="result-quote">
+        “${result.conversa}”
+      </div>
+
+      <div class="result-text">
+        ${result.texto}
+      </div>
+
+      <div class="result-label">
+        Um primeiro movimento
+      </div>
+
+      <div class="result-text">
+        ${result.movimento}
+      </div>
+
+    </div>
+  `;
+}
+
+
+function showResult(resultData) {
+
+  const {
+    primary,
+    primaryPatterns
+  } = resultData;
+
+  const resultPatterns = getResultPatterns(resultData);
+
+  const isTie = !primary;
+
+  const resultHeading = isTie
+    ? "As tendências que mais apareceram"
+    : "Sua tendência predominante";
+
+  const resultIntro = isTie
+    ? `
       <div class="result-text">
         Suas respostas ficaram equilibradas entre essas tendências.
         Por isso, não vamos escolher uma delas artificialmente como predominante.
       </div>
-
-      <div class="result-label">
-        O que isso significa?
-      </div>
-
+    `
+    : `
       <div class="result-text">
-        O Quiz oferece uma primeira leitura. O Mapa da Conversa aprofunda
-        a análise para entender como esses movimentos podem aparecer
-        juntos nas suas conversas.
+        Esta foi a tendência que apareceu com mais força nas suas respostas.
+        ${resultPatterns.length > 1
+          ? "Uma segunda tendência também apareceu com força suficiente para fazer parte desta primeira leitura."
+          : ""}
       </div>
-
-      <div class="result-label">
-        Seu resultado também foi enviado por e-mail.
-      </div>
-
-      <div class="result-text">
-        Confira sua caixa de entrada para continuar a leitura.
-      </div>
-
-      <div class="result-label">
-        Quer aprofundar essa leitura?
-      </div>
-
-      <div class="result-text">
-        O Mapa da Conversa completo analisa suas respostas
-        em 18 situações para mostrar como suas travas aparecem
-        ao Escutar, Falar e Interagir.
-      </div>
-
-      <button class="btn"
-        onclick="window.location.href='https://www.adrianadecastro.com.br/mapa-da-conversa'">
-        Quero conhecer meu Mapa da Conversa completo →
-      </button>
-
     `;
 
-    return;
-  }
-
-  const result = RESULTS[primary];
-
-  const secondaryBlock = secondary
-    ? `
-      <div class="result-label">
-        Uma segunda tendência também apareceu
-      </div>
-
-      <div class="result-secondary">
-        <strong>${secondary}</strong>
-      </div>
-    `
-    : "";
+  const resultBlocks = resultPatterns
+    .map(pattern => renderPatternResult(pattern))
+    .join("");
 
   quizArea.innerHTML = `
 
@@ -852,31 +861,25 @@ function showResult(resultData) {
     <div class="result-meta">
 
       <div class="meta-label">
-        Sua tendência predominante
+        ${resultHeading}
       </div>
 
       <div class="meta-value">
-        ${primary}
+        ${resultPatterns.map(pattern => RESULTS[pattern].nome).join(" + ")}
       </div>
 
     </div>
 
-    ${secondaryBlock}
+    ${resultIntro}
 
-    <div class="result-quote">
-      “${result.conversa}”
-    </div>
-
-    <div class="result-text">
-      ${result.texto}
-    </div>
+    ${resultBlocks}
 
     <div class="result-label">
-      Um primeiro movimento
+      Seu resultado também foi enviado por e-mail.
     </div>
 
     <div class="result-text">
-      ${result.movimento}
+      Confira sua caixa de entrada para continuar a leitura.
     </div>
 
     <div class="result-label">
