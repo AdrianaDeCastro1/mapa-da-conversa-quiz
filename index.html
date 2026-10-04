@@ -189,6 +189,59 @@ h1, h2 {
   margin: 22px 0 7px;
 }
 
+
+.capture-title {
+  font-size: 26px;
+  line-height: 1.3;
+  margin: 0 0 14px;
+}
+
+.capture-text {
+  font-size: 15.5px;
+  line-height: 1.65;
+  margin-bottom: 22px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 7px;
+}
+
+.field input {
+  width: 100%;
+  border: 1px solid #d7dce2;
+  border-radius: 10px;
+  padding: 13px 14px;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--green);
+}
+
+.form-error {
+  color: #a33a3a;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+.result-secondary {
+  margin-top: 10px;
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+
 @media (max-width: 520px) {
   body {
     padding: 18px 10px;
@@ -396,6 +449,9 @@ const RESULTS = {
 
 let currentQuestion = 0;
 let answers = [];
+let leadName = "";
+let leadEmail = "";
+let currentResult = null;
 
 const quizArea = document.getElementById("quizArea");
 const progressBar = document.getElementById("progressBar");
@@ -491,7 +547,7 @@ function selectAnswer(optionIndex) {
 
   } else {
 
-    showResult();
+    showCapture();
 
   }
 }
@@ -521,10 +577,7 @@ function calculateScores() {
 }
 
 
-function showResult() {
-
-  progressBar.style.width = "100%";
-
+function getResultData() {
   const scores = calculateScores();
 
   const ordered = Object.keys(scores)
@@ -532,25 +585,259 @@ function showResult() {
 
   const highest = scores[ordered[0]];
 
-  const primary = ordered.filter(
+  const primaryPatterns = ordered.filter(
     pattern => scores[pattern] === highest
   );
 
-  const mainPattern = primary[0];
-
-  const result = RESULTS[mainPattern];
-
-  let title;
-
-  if (primary.length === 1) {
-
-    title = "Sua tendência predominante";
-
-  } else {
-
-    title = "As tendências que mais apareceram";
-
+  // Empate no topo: não força predominante.
+  if (primaryPatterns.length > 1) {
+    return {
+      scores,
+      primary: null,
+      primaryPatterns,
+      secondary: null,
+      primaryScore: highest,
+      secondaryScore: null
+    };
   }
+
+  const primary = primaryPatterns[0];
+  const primaryScore = scores[primary];
+
+  const candidates = ordered
+    .filter(pattern => pattern !== primary)
+    .filter(pattern => scores[pattern] >= 2)
+    .filter(pattern => scores[pattern] / primaryScore >= 0.60);
+
+  const secondary = candidates.length ? candidates[0] : null;
+  const secondaryScore = secondary ? scores[secondary] : null;
+
+  return {
+    scores,
+    primary,
+    primaryPatterns,
+    secondary,
+    primaryScore,
+    secondaryScore
+  };
+}
+
+
+function showCapture() {
+
+  progressBar.style.width = "100%";
+
+  quizArea.innerHTML = `
+    <div class="result-kicker">
+      SEU RESULTADO ESTÁ PRONTO
+    </div>
+
+    <h1 class="capture-title">
+      Antes de ver sua primeira leitura, deixe seu e-mail.
+    </h1>
+
+    <p class="capture-text">
+      Vamos enviar seu resultado por e-mail para você poder consultar depois.
+    </p>
+
+    <div class="field">
+      <label for="leadName">Seu nome</label>
+      <input
+        id="leadName"
+        type="text"
+        autocomplete="name"
+        placeholder="Como você gostaria de ser chamada?"
+      >
+    </div>
+
+    <div class="field">
+      <label for="leadEmail">Seu melhor e-mail</label>
+      <input
+        id="leadEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="seuemail@exemplo.com"
+      >
+    </div>
+
+    <div id="formError"></div>
+
+    <button class="btn" onclick="submitLead()">
+      Ver meu resultado →
+    </button>
+  `;
+}
+
+
+async function submitLead() {
+
+  const nameInput = document.getElementById("leadName");
+  const emailInput = document.getElementById("leadEmail");
+  const errorArea = document.getElementById("formError");
+  const button = document.querySelector(".btn");
+
+  leadName = nameInput.value.trim();
+  leadEmail = emailInput.value.trim();
+
+  if (!leadName) {
+    errorArea.innerHTML =
+      '<div class="form-error">Digite seu nome para continuar.</div>';
+    nameInput.focus();
+    return;
+  }
+
+  if (!leadEmail || !emailInput.checkValidity()) {
+    errorArea.innerHTML =
+      '<div class="form-error">Digite um e-mail válido para continuar.</div>';
+    emailInput.focus();
+    return;
+  }
+
+  currentResult = getResultData();
+
+  button.disabled = true;
+  button.textContent = "Preparando seu resultado...";
+
+  errorArea.innerHTML = "";
+
+  try {
+
+    const response = await fetch(
+      "https://gykonsallbevyoaeiiqt.supabase.co/functions/v1/send-quiz-result",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: leadName,
+          email: leadEmail,
+          result: currentResult.primary || "EMPATE",
+          secondary: currentResult.secondary,
+          primaryPatterns: currentResult.primaryPatterns,
+          pontuacaoPredominante: currentResult.primaryScore,
+          pontuacaoSecundario: currentResult.secondaryScore,
+          respostas: answers
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.error || "Não foi possível enviar seu resultado."
+      );
+    }
+
+    showResult(currentResult);
+
+  } catch (error) {
+
+    console.error(error);
+
+    button.disabled = false;
+    button.textContent = "Tentar novamente";
+
+    errorArea.innerHTML = `
+      <div class="form-error">
+        Não conseguimos enviar seu resultado agora.
+        Confira seu e-mail ou tente novamente em alguns instantes.
+      </div>
+    `;
+  }
+}
+
+
+function showResult(resultData) {
+
+  const {
+    primary,
+    primaryPatterns,
+    secondary
+  } = resultData;
+
+  // Empate no topo: não escolhemos um predominante artificialmente.
+  if (!primary) {
+
+    quizArea.innerHTML = `
+
+      <div class="result-kicker">
+        UMA PRIMEIRA LEITURA DO SEU MAPA
+      </div>
+
+      <h1 class="result-title">
+        Seu resultado
+      </h1>
+
+      <div class="result-meta">
+
+        <div class="meta-label">
+          As tendências que mais apareceram
+        </div>
+
+        <div class="meta-value">
+          ${primaryPatterns.join(" + ")}
+        </div>
+
+      </div>
+
+      <div class="result-text">
+        Suas respostas ficaram equilibradas entre essas tendências.
+        Por isso, não vamos escolher uma delas artificialmente como predominante.
+      </div>
+
+      <div class="result-label">
+        O que isso significa?
+      </div>
+
+      <div class="result-text">
+        O Quiz oferece uma primeira leitura. O Mapa da Conversa aprofunda
+        a análise para entender como esses movimentos podem aparecer
+        juntos nas suas conversas.
+      </div>
+
+      <div class="result-label">
+        Seu resultado também foi enviado por e-mail.
+      </div>
+
+      <div class="result-text">
+        Confira sua caixa de entrada para continuar a leitura.
+      </div>
+
+      <div class="result-label">
+        Quer aprofundar essa leitura?
+      </div>
+
+      <div class="result-text">
+        O Mapa da Conversa completo analisa suas respostas
+        em 18 situações para mostrar como suas travas aparecem
+        ao Escutar, Falar e Interagir.
+      </div>
+
+      <button class="btn"
+        onclick="window.location.href='https://www.adrianadecastro.com.br/mapa-da-conversa'">
+        Quero conhecer meu Mapa da Conversa completo →
+      </button>
+
+    `;
+
+    return;
+  }
+
+  const result = RESULTS[primary];
+
+  const secondaryBlock = secondary
+    ? `
+      <div class="result-label">
+        Uma segunda tendência também apareceu
+      </div>
+
+      <div class="result-secondary">
+        <strong>${secondary}</strong>
+      </div>
+    `
+    : "";
 
   quizArea.innerHTML = `
 
@@ -565,14 +852,16 @@ function showResult() {
     <div class="result-meta">
 
       <div class="meta-label">
-        ${title}
+        Sua tendência predominante
       </div>
 
       <div class="meta-value">
-        ${primary.join(" + ")}
+        ${primary}
       </div>
 
     </div>
+
+    ${secondaryBlock}
 
     <div class="result-quote">
       “${result.conversa}”
@@ -601,7 +890,7 @@ function showResult() {
     </div>
 
     <button class="btn"
-      onclick="alert('Na próxima etapa vamos conectar esta tela ao Mapa Completo.')">
+      onclick="window.location.href='https://www.adrianadecastro.com.br/mapa-da-conversa'">
       Quero conhecer meu Mapa da Conversa completo →
     </button>
 
