@@ -405,52 +405,87 @@ const QUESTIONS = [
 const RESULTS = {
 
   DEFESA: {
-    nome: "DEFESA",
-    conversa: "Eu preciso me proteger antes de ouvir você.",
-    texto: "A Defesa aparece quando, diante de uma crítica, cobrança ou discordância, surge a necessidade de se proteger antes mesmo de compreender completamente o que o outro está dizendo. Esse movimento pode ajudar você a preservar seus limites e sua posição. O ponto de atenção aparece quando essa proteção entra em cena antes da escuta.",
-    movimento: "Antes de responder, experimente perguntar: estou respondendo ao que foi realmente dito ou ao que imaginei que isso significa sobre mim?"
+    title: "Sua conversa pode estar sendo conduzida pela Defesa",
+    text: `A Defesa aparece quando você percebe, de forma real ou interpretada, que alguma coisa importante está sendo ameaçada na conversa: sua posição, sua competência, sua imagem, seus limites ou sua autonomia.
+
+Talvez isso apareça quando você sente necessidade de justificar uma decisão, rebater uma crítica, explicar sua intenção ou provar que não está errada.
+
+A questão não é deixar de se defender. É perceber quando a proteção entra em cena antes de você compreender o que realmente está acontecendo na conversa.`,
+    invisible: "Eu preciso me proteger.",
+    resource: "Existe um recurso importante nesse movimento: firmeza, autonomia, capacidade de estabelecer limites e coragem para sustentar sua posição.",
+    impact: "O ponto de atenção aparece quando essa proteção transforma uma pergunta ou observação em uma ameaça. O outro pode receber resistência, fechamento ou confronto antes mesmo de conseguir concluir o que queria dizer."
   },
 
   RESGUARDO: {
-    nome: "RESGUARDO",
-    conversa: "Eu quero me colocar, mas alguma coisa me faz recuar.",
-    texto: "O Resguardo aparece quando existe vontade de se colocar, mas você acaba recuando diante da possibilidade de se expor. Esse movimento pode trazer prudência, observação e respeito pelos próprios limites. O ponto de atenção aparece quando o cuidado de se preservar impede você de dizer aquilo que realmente pensa, sente, precisa ou quer.",
-    movimento: "Pergunte a si mesma: o que eu gostaria de dizer se não precisasse controlar a reação do outro?"
+    title: "Sua conversa pode estar sendo conduzida pelo Resguardo",
+    text: `O Resguardo aparece quando você tem algo a dizer, sentir, perguntar ou discordar, mas recua antes de se expor.
+
+Talvez isso aconteça quando você pensa muito antes de falar, evita uma pergunta, responde "tanto faz", deixa de discordar ou espera que o outro perceba aquilo que você não conseguiu dizer.
+
+A questão não é falar tudo. É perceber quando o medo de se expor está escolhendo por você.`,
+    invisible: "É mais seguro não me expor.",
+    resource: "Existe um recurso importante nesse movimento: prudência, sensibilidade, observação, discrição e capacidade de preservar seus limites.",
+    impact: "O ponto de atenção aparece quando esse cuidado faz com que apenas uma parte de você entre na conversa. O outro pode receber um 'está tudo bem' quando, na verdade, existe algo importante que você gostaria de dizer."
   },
 
   ATROPELO: {
-    nome: "ATROPELO",
-    conversa: "Eu preciso avançar.",
-    texto: "O Atropelo aparece quando a necessidade de avançar, resolver ou conduzir faz você ocupar o espaço da conversa antes que o outro termine de construir o que queria dizer. Esse movimento traz iniciativa, ação e capacidade de condução. O ponto de atenção aparece quando essa velocidade faz você perder informações importantes.",
-    movimento: "Antes de avançar, pergunte: o que ainda precisa ser ouvido antes de eu responder?"
+    title: "Sua conversa pode estar sendo conduzida pelo Atropelo",
+    text: `O Atropelo aparece quando a necessidade de fazer a conversa avançar faz você deixar de considerar o espaço, o tempo ou a participação do outro.
+
+Talvez isso aconteça quando você interrompe, completa a frase do outro, apresenta uma solução antes de entender o problema, responde antes que a pessoa termine ou conduz a conversa rapidamente para uma decisão.
+
+A questão não é deixar de tomar iniciativa. É perceber quando avançar começa a ocupar o caminho do outro.`,
+    invisible: "Eu preciso avançar.",
+    resource: "Existe um recurso importante nesse movimento: iniciativa, agilidade, objetividade, capacidade de decisão, liderança e foco em soluções.",
+    impact: "O ponto de atenção aparece quando a sua intenção de ajudar ou resolver faz o outro sentir que não foi ouvido, que a decisão já estava tomada ou que não teve espaço para participar."
   },
 
   APROVAÇÃO: {
-    nome: "APROVAÇÃO",
-    conversa: "Eu me adapto a você.",
-    texto: "A Aprovação aparece quando a necessidade de preservar o vínculo faz você adaptar sua posição ao que acredita que o outro espera. Esse movimento traz empatia, sensibilidade e cuidado com os relacionamentos. O ponto de atenção aparece quando, para evitar desagradar, você deixa sua própria posição em segundo plano.",
-    movimento: "Pergunte: o que é verdadeiro para mim nesta situação, antes de pensar no que o outro gostaria de ouvir?"
+    title: "Sua conversa pode estar sendo conduzida pela Aprovação",
+    text: `A Aprovação aparece quando preservar a aceitação do outro se torna mais importante do que sustentar aquilo que é verdadeiro para você.
+
+Talvez isso aconteça quando você concorda mesmo sem concordar, cede para evitar desconforto, suaviza demais o que gostaria de dizer ou muda sua posição para aumentar as chances de ser aceita.
+
+A questão não é deixar de considerar o outro. É conseguir considerar o outro sem deixar de considerar a si mesma.`,
+    invisible: "Eu me adapto a você.",
+    resource: "Existe um recurso importante nesse movimento: empatia, sensibilidade, diplomacia, generosidade, adaptabilidade e cuidado com os vínculos.",
+    impact: "O ponto de atenção aparece quando, para preservar a relação, você começa a abrir mão da própria voz. O outro pode receber uma versão muito adaptada de você e não perceber aquilo que realmente pensa, sente ou precisa."
   },
 
   EXPLICAÇÃO: {
-    nome: "EXPLICAÇÃO",
-    conversa: "Eu preciso explicar.",
-    texto: "A Explicação aparece quando existe uma necessidade de garantir que o outro compreenda aquilo que você quer dizer. Esse movimento traz capacidade de aprofundar, esclarecer e organizar informações. O ponto de atenção aparece quando você continua explicando além do necessário e deixa menos espaço para o outro.",
-    movimento: "Pergunte: o que é essencial dizer agora?"
+    title: "Sua conversa pode estar sendo conduzida pela Explicação",
+    text: `A Explicação aparece quando você se envolve tanto em contar, esclarecer ou contextualizar que perde a percepção do espaço e do interesse do outro.
+
+Talvez isso aconteça quando você acrescenta detalhes, exemplos, justificativas ou novas histórias mesmo depois de já ter transmitido o essencial.
+
+A questão não é falar menos. É perceber o que é essencial para aquela conversa e deixar o restante entrar somente se houver interesse.`,
+    invisible: "Eu preciso contar.",
+    resource: "Existe um recurso importante nesse movimento: entusiasmo, comunicação, capacidade narrativa, conhecimento, memória, atenção aos detalhes e disposição para compartilhar.",
+    impact: "O ponto de atenção aparece quando a necessidade de explicar ocupa espaço demais. O outro pode receber uma quantidade de informação maior do que precisava naquele momento e perder justamente o ponto principal."
   },
 
   COMPETIÇÃO: {
-    nome: "COMPETIÇÃO",
-    conversa: "Eu não posso ficar por baixo.",
-    texto: "A Competição aparece quando a pessoa entra na conversa medindo seu valor em relação ao outro. Esse movimento traz ambição, determinação e desejo de crescer. O ponto de atenção aparece quando a necessidade de sustentar sua posição transforma a conversa em uma disputa para provar quem tem razão.",
-    movimento: "Experimente trocar, por alguns instantes, a necessidade de responder pela curiosidade: o que existe no ponto de vista do outro que eu ainda não considerei?"
+    title: "Sua conversa pode estar sendo conduzida pela Competição",
+    text: `A Competição aparece quando a pessoa do outro lado se transforma, ainda que sem intenção consciente, em uma medida do seu próprio valor.
+
+Talvez isso aconteça quando você sente necessidade de mostrar que também sabe, também fez, também viveu, ou quando surge o impulso de demonstrar que sua experiência foi maior ou mais difícil.
+
+A questão não é abandonar sua ambição ou deixar de sustentar o que sabe. É não precisar estar por cima para reconhecer o próprio valor.`,
+    invisible: "Eu não posso ficar por baixo.",
+    resource: "Existe um recurso importante nesse movimento: ambição, determinação, excelência, coragem, crescimento e energia para superar desafios.",
+    impact: "O ponto de atenção aparece quando a troca se transforma em comparação. O outro pode sentir que precisa disputar espaço ou provar seu próprio valor, mesmo quando essa não era a sua intenção."
   },
 
   DESCONEXÃO: {
-    nome: "DESCONEXÃO",
-    conversa: "Eu já sei onde essa conversa vai dar.",
-    texto: "A Desconexão acontece quando você deixa de acompanhar o que o outro está realmente dizendo porque sua própria narrativa interna passa a ocupar o lugar da escuta. Esse movimento pode trazer autonomia e capacidade de preservar energia. O ponto de atenção aparece quando você começa a reagir a uma interpretação sua, em vez de acompanhar o que está sendo construído na conversa.",
-    movimento: "Pergunte: estou acompanhando o que o outro realmente disse ou já estou reagindo à história que criei na minha cabeça?"
+    title: "Sua conversa pode estar sendo conduzida pela Desconexão",
+    text: `A Desconexão aparece quando você deixa de acompanhar o que o outro está realmente dizendo e começa a criar, dentro da própria cabeça, suposições e histórias sobre o que está acontecendo.
+
+Talvez o outro ainda esteja falando, mas você já esteja interpretando intenções, antecipando o que ele vai dizer, tirando conclusões ou respondendo àquilo que imaginou que a conversa significa.
+
+A questão não é simplesmente se afastar da conversa. É perceber quando a sua própria narrativa interna passou a ocupar o lugar da escuta.`,
+    invisible: "Eu saio daqui.",
+    resource: "Existe um recurso importante nesse movimento: autonomia, independência, capacidade de preservar energia e discernimento para escolher quais conflitos e conversas merecem sua participação.",
+    impact: "O ponto de atenção aparece quando você deixa de acompanhar a conversa real e passa a reagir àquilo que construiu internamente. O outro pode sentir que você está ali, mas já não está realmente com ele naquela conversa."
   }
 
 };
@@ -777,35 +812,42 @@ function renderPatternResult(pattern) {
 
   const result = RESULTS[pattern];
 
+  const textParagraphs = result.text
+    .split(/\n\s*\n/)
+    .map(paragraph => `<p>${paragraph}</p>`)
+    .join("");
+
   return `
     <div class="result-pattern">
 
       <div class="result-meta">
-
         <div class="meta-label">
           Tendência
         </div>
 
         <div class="meta-value">
-          ${result.nome}
+          ${result.title}
         </div>
-
-      </div>
-
-      <div class="result-quote">
-        “${result.conversa}”
       </div>
 
       <div class="result-text">
-        ${result.texto}
+        ${textParagraphs}
       </div>
 
       <div class="result-label">
-        Um primeiro movimento
+        Conversa invisível
+      </div>
+
+      <div class="result-quote">
+        “${result.invisible}”
       </div>
 
       <div class="result-text">
-        ${result.movimento}
+        ${result.resource}
+      </div>
+
+      <div class="result-text">
+        ${result.impact}
       </div>
 
     </div>
