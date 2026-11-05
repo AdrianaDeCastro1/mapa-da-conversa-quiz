@@ -112,9 +112,11 @@ h1, h2 {
   transition: all .15s ease;
 }
 
-.opt:hover {
-  border-color: var(--green);
-  background: #f0f7e0;
+@media (hover: hover) and (pointer: fine) {
+  .opt:hover {
+    border-color: var(--green);
+    background: #f0f7e0;
+  }
 }
 
 .btn {
